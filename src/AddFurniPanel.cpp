@@ -88,6 +88,15 @@ void AddFurniPanel::delete_furni() {
         furni_list_.erase(it, furni_list_.end());
     }
 
+    // update panel
+    name_box_->clear();
+    belong_box_->clear();
+
+    for (const auto& it : furni_list_) {
+        addUnique(name_box_, QString::fromStdString(it.name));
+        addUnique(belong_box_, QString::fromStdString(it.furni.belong));
+    }
+    // Visualization
     clearMarker();
     pubMarker();
 }
@@ -186,10 +195,11 @@ void AddFurniPanel::open_file() {
         if (!openfile.response.furni_list.empty()) {
             ROS_INFO("Received furni list!");
             furni_list_.clear();
+            furni_list_ = openfile.response.furni_list;
+            
             name_box_->clear();
             belong_box_->clear();
 
-            furni_list_ = openfile.response.furni_list;
             for (const auto& it : furni_list_) {
                 addUnique(name_box_, QString::fromStdString(it.name));
                 addUnique(belong_box_, QString::fromStdString(it.furni.belong));
@@ -199,7 +209,7 @@ void AddFurniPanel::open_file() {
             pubMarker();
         }
         else {
-            ROS_INFO("Failed to receive furni list!");
+            ROS_ERROR("Failed to receive furni list!");
         }
     }
     else {
