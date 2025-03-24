@@ -1,0 +1,39 @@
+furniture:
+    sofa:
+        frame: "map"
+        plane: [
+            [5.9, -1.6],
+            [5.0, -1.6],
+            [5.0, -3.5],
+            [5.9, -3.5]
+        ]
+        belong: "living room"
+        access: [
+            [[5.0, -1.6], [5.0, -3.5]]
+        ]
+
+    chair:
+        frame: "map"
+        plane: [
+            [5.0, -3.5],
+            [4.5, -3.5],
+            [4.5, -4.0],
+            [5.0, -4.0]
+        ]
+        belong: "living room"
+        access: [
+            [[5.0, -3.5], [4.5, -3.5]]
+        ]
+
+    tv stand:
+        frame: "map"
+        plane: [
+            [4.5, -3.3],
+            [3.3, -3.3],
+            [3.3, -3.9],
+            [4.5, -3.9]
+        ]
+        belong: "living room"
+        access: [
+            [[4.5, -3.3], [3.3, -3.3]]
+        ]

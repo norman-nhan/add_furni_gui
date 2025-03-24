@@ -1,0 +1,6 @@
+<launch>    
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find add_furni_gui)/rviz/default.rviz" output="screen"/>
+    <node name="add_furni_gui_node" pkg="add_furni_gui" type="add_furni_gui_node"  output="screen" respawn="false">
+        <param name="open_file_path" value="$(find add_furni_gui)/yaml/furniture.yaml" type="string"/>
+    </node>
+</launch>

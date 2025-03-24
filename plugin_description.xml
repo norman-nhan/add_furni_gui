@@ -1,0 +1,7 @@
+<library path="lib/libadd_furni_gui">
+    <class name="add_furni_gui/AddFurniPanel" type="add_furni_gui::AddFurniPanel" base_class_type="rviz::Panel">
+        <description>
+            Add Furni Panel
+        </description>
+    </class>
+</library>
