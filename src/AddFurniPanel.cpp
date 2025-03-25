@@ -71,8 +71,39 @@ void AddFurniPanel::onInitialize() {
     pub_ = nh_.advertise<visualization_msgs::MarkerArray>("makers", 1);
 }
 
-double AddFurniPanel::round(double x) {
-    return std::round(x * 10.0) / 10.0;
+void AddFurniPanel::open_file() {
+    QString fpath = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "YAML Files (*.yaml *.yml)");
+    OpenFile openfile;
+    if(!fpath.isEmpty()) {
+        openfile.request.fpath = fpath.toStdString();
+    } else {
+        openfile.request.fpath = ros::package::getPath("add_furni_gui") + "/yaml/furniture.yaml";
+    }
+    if (client_.call(openfile)) {
+        ROS_INFO("Opening file: %s", openfile.request.fpath.c_str());
+        if (!openfile.response.furni_list.empty()) {
+            ROS_INFO("Received furni list!");
+            furni_list_.clear();
+            furni_list_ = openfile.response.furni_list;
+            
+            name_box_->clear();
+            belong_box_->clear();
+
+            for (const auto& it : furni_list_) {
+                addUnique(name_box_, QString::fromStdString(it.name));
+                addUnique(belong_box_, QString::fromStdString(it.furni.belong));
+            }
+            // Visualization
+            clearMarker();
+            pubMarker();
+        }
+        else {
+            ROS_ERROR("Failed to receive furni list!");
+        }
+    }
+    else {
+        ROS_ERROR("Failed to call open file service!");
+    }
 }
 
 void AddFurniPanel::delete_furni() {
@@ -121,6 +152,10 @@ int AddFurniPanel::getFurniIndex(const std::string& name) {
     return -1; // not found
 }
 
+double AddFurniPanel::round(double x) {
+    return std::round(x * 10.0) / 10.0;
+}
+
 void AddFurniPanel::addPoint(const geometry_msgs::PointStamped::ConstPtr& msg) {
     if (recording_ && points_.size() < 4) {
         geometry_msgs::Point p = msg->point;
@@ -134,6 +169,9 @@ void AddFurniPanel::addPoint(const geometry_msgs::PointStamped::ConstPtr& msg) {
             recording_ = false;
             
             QString name = name_box_->currentText();
+            if (name.isEmpty()) {
+                name = QString("untitled");
+            }
             
             FurniWithName furni;
             int idx = getFurniIndex(name.toStdString());
@@ -155,6 +193,8 @@ void AddFurniPanel::addPoint(const geometry_msgs::PointStamped::ConstPtr& msg) {
     
                 furni_list_.push_back(furni);
             }
+
+            ROS_INFO("Adding %s completed.", name.toStdString().c_str());
 
             points_.clear();
             clearMarker();
@@ -179,41 +219,6 @@ QHBoxLayout* AddFurniPanel::createLayout(QString label, QWidget* wid) {
 void AddFurniPanel::addUnique(QComboBox* box, const QString& item) {
     if (box->findText(item) == -1) {
         box->addItem(item);
-    }
-}
-
-void AddFurniPanel::open_file() {
-    QString fpath = QFileDialog::getOpenFileName(nullptr, "Open File", QDir::homePath(), "YAML Files (*.yaml *.yml)");
-    OpenFile openfile;
-    if(!fpath.isEmpty()) {
-        openfile.request.fpath = fpath.toStdString();
-    } else {
-        openfile.request.fpath = ros::package::getPath("add_furni_gui") + "/yaml/furniture.yaml";
-    }
-    if (client_.call(openfile)) {
-        ROS_INFO("Opening file: %s", openfile.request.fpath.c_str());
-        if (!openfile.response.furni_list.empty()) {
-            ROS_INFO("Received furni list!");
-            furni_list_.clear();
-            furni_list_ = openfile.response.furni_list;
-            
-            name_box_->clear();
-            belong_box_->clear();
-
-            for (const auto& it : furni_list_) {
-                addUnique(name_box_, QString::fromStdString(it.name));
-                addUnique(belong_box_, QString::fromStdString(it.furni.belong));
-            }
-            // Visualization
-            clearMarker();
-            pubMarker();
-        }
-        else {
-            ROS_ERROR("Failed to receive furni list!");
-        }
-    }
-    else {
-        ROS_ERROR("Failed to call open file service!");
     }
 }
 
