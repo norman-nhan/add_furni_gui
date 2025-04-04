@@ -36,5 +36,5 @@ rosrun add_furni_gui add_furni_gui_node
 ```
 or
 ```
-rosrun add_furni_gui test.launch
+roslaunch add_furni_gui test.launch
 ```
